@@ -5,3 +5,4 @@ DecisionTree/main_copy.py
 EnsembleLearning/ex.csv
 **/*.png
 **/*.pkl
+**/.DS_Store
