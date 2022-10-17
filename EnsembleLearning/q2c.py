@@ -53,14 +53,14 @@ if __name__ == "__main__":
     test_dataloader = DataLoader("bank-2/test.csv", attribute_values, label_values)
     test_df = test_dataloader.convert_binary_test_data(train_dataloader.median_info)
     
-    repeat_ = 3
+    repeat_ = 100
     
     single_result = pd.DataFrame() #np.empty((test_dataloader.len, repeat_), dtype=object)
     bag_result = pd.DataFrame()
     
     for j in range(repeat_):
         model_list = []
-        for i in range(2):
+        for i in range(500):
             print(f"-------- Training Decision tree for repeat={j+1} and t={i+1} ------------")
             
             ## Resample the data distribution

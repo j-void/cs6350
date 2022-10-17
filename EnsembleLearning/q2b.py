@@ -84,6 +84,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
     ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
     ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
+    ax.legend()
     ax.set(xlabel='steps', ylabel='Error')
     fig.savefig("q2b_1.png")
     
