@@ -1,0 +1,7 @@
+**/__pycache__
+bkup
+test.ipynb
+DecisionTree/main_copy.py
+EnsembleLearning/ex.csv
+**/*.png
+**/*.pkl
