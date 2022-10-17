@@ -58,7 +58,7 @@ if __name__ == "__main__":
     for j in range(500):
         model_list = []
         for i in range(j+1):
-            print(f"-------- Training for t={j+1} trees - t={i+1}th tree ------------")
+            print(f"-------- Training for {j+1} trees - t={i+1}th tree ------------")
             
             ## Resample the data distribution
             train_df = train_df.sample(frac=1, replace=True)
