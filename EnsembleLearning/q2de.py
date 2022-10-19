@@ -57,12 +57,13 @@ if __name__ == "__main__":
     single_result = pd.DataFrame()
     rf_result = pd.DataFrame()
     
+    N = 5
     for f_size in features:
         model_list = []
         train_errors = []
         test_errors = []
         steps = []
-        for i in range(500):
+        for i in range(N):
             print(f"-------- Training Decision tree for f_size: {f_size} & t={i+1} ------------")
             ## Resample the data distribution
             train_df = train_df.sample(frac=1, replace=True)
@@ -98,7 +99,7 @@ if __name__ == "__main__":
                 bias_single.append(0)
             else:
                 bias_single.append(1)
-            var = len(single_result.iloc[i][single_result.iloc[i]!= avg_output])/(repeat_-1)
+            var = len(single_result.iloc[i][single_result.iloc[i]!= avg_output])/(N-1)
             #print(var, avg_output, single_result.iloc[i])
             variance_single.append(var)
             
@@ -109,7 +110,7 @@ if __name__ == "__main__":
                 bias_rf.append(0)
             else:
                 bias_rf.append(1)
-            var = len(rf_result.iloc[i][rf_result.iloc[i]!= avg_output])/(repeat_-1)
+            var = len(rf_result.iloc[i][rf_result.iloc[i]!= avg_output])/(N-1)
             variance_rf.append(var)
         bias_single_avg = np.average(bias_single)
         variance_single_avg = np.average(variance_single)
@@ -140,8 +141,8 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     for key, value in features_dict.items():
         fig, ax = plt.subplots()
-        ax.plot(np.array(value["steps"]), np.array(value["train_errors"]), '-bo', label="Train Error")
-        ax.plot(np.array(value["steps"]), np.array(value["test_errors"]), '-ro', label="Test Error")
+        ax.plot(np.array(value["trees"]), np.array(value["train_errors"]), '-bo', label="Train Error")
+        ax.plot(np.array(value["trees"]), np.array(value["test_errors"]), '-ro', label="Test Error")
         ax.set(xlabel='Trees', ylabel='Error_f'+key)
         ax.legend()
         fig.savefig("q2de_f"+key+".png")

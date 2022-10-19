@@ -148,7 +148,7 @@ class ID3(object):
                 max_ig = ig_
                 best_attr = attribute_keys[i]
             #print("IG of", attribute_keys[i], "=",ig_)
-        print("Best Attribute:", best_attr)
+        #print("Best Attribute:", best_attr)
         #print(attribute_keys)
         root_node = Node(best_attr)
         unique_labels_new = attributes[best_attr]
@@ -197,7 +197,8 @@ class ID3(object):
         main_key = list(self.label.keys())[0]
         main_unique_labels = self.label[main_key]# S[label].unique()
         ## subset the attributes
-        attributes = random.sample(attributes.items(), feature_size)
+        attributes = dict(random.sample(attributes.items(), feature_size))
+        #print(attributes)
         ## Take care of max depth condition
         #print(max_depth)
         max_depth -= 1
@@ -253,7 +254,7 @@ class ID3(object):
                 max_ig = ig_
                 best_attr = attribute_keys[i]
             #print("IG of", attribute_keys[i], "=",ig_)
-        #print("Best Attribute:", best_attr)
+        ###print("Best Attribute:", best_attr)
         #print(attribute_keys)
         root_node = Node(best_attr)
         unique_labels_new = attributes[best_attr]
