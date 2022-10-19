@@ -57,7 +57,7 @@ if __name__ == "__main__":
     single_result = pd.DataFrame()
     rf_result = pd.DataFrame()
     
-    N = 5
+    N = 500
     for f_size in features:
         model_list = []
         train_errors = []
