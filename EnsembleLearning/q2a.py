@@ -58,10 +58,12 @@ if __name__ == "__main__":
     
     test_dataloader = DataLoader("bank-2/test.csv", attribute_values, label_values)
     test_df = test_dataloader.convert_binary_test_data(train_dataloader.median_info)
+    
     steps = []
-    for i in range(500):
+    
+    for i in range(50):
         print(f"-------- Training Decision tree for t={i+1} ------------")
-        #print(train_df["weights"])
+        #print(train_df)
         id3_bank = ID3(label_values, attribute_values, 1, purity_type="entropy")
         id3_bank.train(train_df)
         
@@ -77,7 +79,6 @@ if __name__ == "__main__":
         
         ## normalize the weights
         weights_ = weights_ / np.sum(weights_)
-        #print(np.sum(weights_))
         train_df["weights"] = weights_
         vote_list.append(vote)
         model_list.append(id3_bank)
@@ -88,26 +89,28 @@ if __name__ == "__main__":
         train_inv_error, _, _ = train_dataloader.calculate_error(id3_bank)
         test_inv_error, _, _ = test_dataloader.calculate_error(id3_bank)
         
-        train_errors.append(train_error)
-        test_errors.append(test_error)
-        train_inv_errors.append(train_inv_error)
-        test_inv_errors.append(test_inv_error)
+        # train_errors.append(train_error)
+        # test_errors.append(test_error)
+        # train_inv_errors.append(train_inv_error)
+        # test_inv_errors.append(test_inv_error)
         
         print(f"Train Error after t={i} : {train_error}, {train_inv_error}")
         print(f"Test Error after t={i} : {test_error}, {test_inv_error}")
     
-    import pickle
-    error_dict = {"train_errors":train_errors, "test_errors":test_errors, "train_inv_errors":train_inv_errors, "test_inv_errors":test_inv_errors}
-    with open('q2a_out.pkl', 'wb') as f:
-        pickle.dump(error_dict, f)
+    # import pickle
+    # error_dict = {"train_errors":train_errors, "test_errors":test_errors, "train_inv_errors":train_inv_errors, "test_inv_errors":test_inv_errors}
+    # with open('q2a_out.pkl', 'wb') as f:
+    #     pickle.dump(error_dict, f)
     
-    fig, ax = plt.subplots()
-    ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
-    ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
-    ax.set(xlabel='steps', ylabel='Error')
-    fig.savefig("q2a_combined.png")
-    fig, ax = plt.subplots()
-    ax.plot(np.array(steps), np.array(train_inv_errors), '-bo', label="Train Error")
-    ax.plot(np.array(steps), np.array(test_inv_errors), '-ro', label="Test Error")
-    ax.set(xlabel='steps', ylabel='Error')
-    fig.savefig("q2a_individual.png")
+    # fig, ax = plt.subplots()
+    # ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
+    # ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
+    # ax.set(xlabel='steps', ylabel='Error Combined')
+    # ax.legend()
+    # fig.savefig("q2a_combined.png")
+    # fig, ax = plt.subplots()
+    # ax.plot(np.array(steps), np.array(train_inv_errors), '-bo', label="Train Error")
+    # ax.plot(np.array(steps), np.array(test_inv_errors), '-ro', label="Test Error")
+    # ax.set(xlabel='steps', ylabel='Error Individual')
+    # ax.legend()
+    # fig.savefig("q2a_individual.png")

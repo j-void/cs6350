@@ -2,6 +2,7 @@ import numpy as np
 import math
 import pandas as pd
 from collections import Counter
+import random
 
 class DataLoader(object):
     def __init__(self, path, attribute_values, label_values):
@@ -32,7 +33,7 @@ class DataLoader(object):
     def convert_binary(self, numerical_attributes):
         self.load_data()
         for attr in numerical_attributes:
-            arr_ = np.array(self.data_dict[attr]).astype(int)
+            arr_ = np.array(self.data_dict[attr]).astype(float)
             median = np.median(arr_)
             self.data_dict[attr] = np.where(arr_>=median, "yes", "no").tolist()
             self.median_info[attr] = median
@@ -41,7 +42,7 @@ class DataLoader(object):
     def convert_binary_test_data(self, median_dict):
         self.load_data()
         for attr in list(median_dict.keys()):
-            arr_ = np.array(self.data_dict[attr]).astype(int)
+            arr_ = np.array(self.data_dict[attr]).astype(float)
             median_ = median_dict[attr]
             self.data_dict[attr] = np.where(arr_>=median_, "yes", "no").tolist()
         return pd.DataFrame(self.data_dict)
@@ -111,6 +112,8 @@ class DataLoader(object):
                 output_ = models[j].run_inference(input_)
                 out_dict[output_] += votes[j]
             output_y = max(out_dict, key=out_dict.get)
+            # if i == random.randint(0, self.len-1):
+            #     print(out_dict, self.data_dict[self.label_keys[0]][i])
             if output_y != self.data_dict[self.label_keys[0]][i]:
                 #print(output_y, self.data_dict[self.label_keys[0]][i], input_, i, out_dict)
                 error += 1

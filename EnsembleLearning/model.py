@@ -8,10 +8,11 @@ import random
 
 def calculate_entropy(p):
     entropy = 0
+    _sum = 1#sum(p)
     for i in range(len(p)):
         if p[i] == 0:
             return 0.0
-        entropy += -p[i]*math.log2(p[i])
+        entropy += -(p[i]/_sum)*math.log2(p[i]/_sum)
     return entropy
 
 def calculate_majority_error(p):
@@ -45,9 +46,11 @@ def calculate_weight_prob(S, label):
     key_ = list(label.keys())[0]
     unique_labels = label[key_]
     prob_ = []
+    total_ = S["weights"].sum()
+    #print(total_)
     for i in range(len(unique_labels)):
         p = S.loc[S[key_]==unique_labels[i]]
-        prob_.append(p["weights"].sum())
+        prob_.append(p["weights"].sum()/total_)
     return prob_
 
 
@@ -115,7 +118,7 @@ class ID3(object):
             return LeafNode(output_) 
         ### calculate probability
         prob_main = calculate_weight_prob(data, self.label)
-        #print(prob_main)
+        #print("prob_main:", prob_main)
         entropy_total = self.purity_fn(prob_main)
         #print("main entropy =", entropy_total)
         max_ig = -math.inf
@@ -132,18 +135,20 @@ class ID3(object):
                 if data_current.shape[0] == 0:
                     continue
                 prob_ = calculate_weight_prob(data_current, self.label)
+                #print("prob -", attribute_keys[i] ,"-", unique_labels_[j],"-", prob_)
                 entropy_current = self.purity_fn(prob_)
                 #print("Entropy =", entropy_current)
                 entropy_.append(entropy_current)
-                length_.append(data_current.shape[0])
+                length_.append(data_current["weights"].sum())
             ## calculate information gain
+            #print("length_:", length_)
             ig_ = IG(entropy_total, length_, entropy_)
             ## selecting the best attribute
             if ig_ > max_ig:
                 max_ig = ig_
                 best_attr = attribute_keys[i]
             #print("IG of", attribute_keys[i], "=",ig_)
-        #print("Best Attribute:", best_attr)
+        print("Best Attribute:", best_attr)
         #print(attribute_keys)
         root_node = Node(best_attr)
         unique_labels_new = attributes[best_attr]
@@ -219,7 +224,7 @@ class ID3(object):
             #print("Leaf Node (", output_,",",max_,")")
             return LeafNode(output_) 
         ### calculate probability
-        prob_main = calculate_weight_prob(data, self.label)
+        prob_main = calculate_prob(data, self.label)
         #print(prob_main)
         entropy_total = self.purity_fn(prob_main)
         #print("main entropy =", entropy_total)
@@ -236,7 +241,7 @@ class ID3(object):
                 data_current = data.loc[data[attribute_keys[i]]==unique_labels_[j]]
                 if data_current.shape[0] == 0:
                     continue
-                prob_ = calculate_weight_prob(data_current, self.label)
+                prob_ = calculate_prob(data_current, self.label)
                 entropy_current = self.purity_fn(prob_)
                 #print("Entropy =", entropy_current)
                 entropy_.append(entropy_current)

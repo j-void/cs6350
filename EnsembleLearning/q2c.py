@@ -6,7 +6,6 @@ from model import *
 from data_loaders import DataLoader
 import sys
     
-
 if __name__ == "__main__":
     
     attribute_values = {
