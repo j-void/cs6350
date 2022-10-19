@@ -62,7 +62,7 @@ if __name__ == "__main__":
         train_errors = []
         test_errors = []
         steps = []
-        for i in range(T):
+        for i in range(500):
             print(f"-------- Training Decision tree for f_size: {f_size} & t={i+1} ------------")
             ## Resample the data distribution
             train_df = train_df.sample(frac=1, replace=True)
