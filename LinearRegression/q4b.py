@@ -53,6 +53,11 @@ if __name__ == "__main__":
     test_cost = cost(y_test, w, x_test)
     print(f"Test Cost={test_cost}")
     
+    import pickle
+    error_dict = {"costs":costs, "test_cost":test_cost, "lr":r, "w":w}
+    with open('q4b_out.pkl', 'wb') as f:
+        pickle.dump(error_dict, f)
+    
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
     ax.plot(np.array(steps), np.array(costs), '-bo')

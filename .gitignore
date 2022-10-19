@@ -6,3 +6,4 @@ EnsembleLearning/ex.csv
 **/*.png
 **/*.pkl
 **/*.DS_Store
+**/*.out
