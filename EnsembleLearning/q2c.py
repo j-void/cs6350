@@ -57,16 +57,16 @@ if __name__ == "__main__":
     single_result = pd.DataFrame() #np.empty((test_dataloader.len, repeat_), dtype=object)
     bag_result = pd.DataFrame()
     
-    for j in range(repeat_):
+    def loop_parallel(j, train_df):
         model_list = []
         for i in range(500):
             print(f"-------- Training Decision tree for repeat={j+1} and t={i+1} ------------")
             
             ## Resample the data distribution
-            train_df = train_df.sample(n=1000, replace=False)
+            train_df_resmapled = train_df.sample(n=1000, replace=True)
             
             id3_bank = ID3(label_values, attribute_values, purity_type="entropy")
-            id3_bank.train(train_df)
+            id3_bank.train(train_df_resmapled)
             
             model_list.append(id3_bank)
         output = test_dataloader.get_output_all(model_list[0])
@@ -74,33 +74,40 @@ if __name__ == "__main__":
         output_b = test_dataloader.get_output_bagging(model_list)
         bag_result[str(j)] = output_b
     
+    # for j in range(repeat_):
+    #     loop_parallel(j, train_df)
+    from joblib import Parallel, delayed
+    Parallel(n_jobs=-1, prefer="threads")(delayed(loop_parallel)(j, train_df) for j in range(repeat_))
+    
     bias_single = []
     variance_single = []
     bias_bag = []
     variance_bag = []
+    print("-------- Solving bias and variance --------")
     for i in range(test_dataloader.len):
-        out_dict = dict.fromkeys(test_dataloader.label_out , 0)
-        #print(len(single_result.iloc[i][single_result.iloc[i]=="no"]))
-        for key in out_dict.keys():
-            out_dict[key] = len(single_result.iloc[i][single_result.iloc[i]==key])
-        avg_output = max(out_dict, key=out_dict.get)
-        if test_dataloader.data_dict[test_dataloader.label_keys[0]][i] == avg_output:
-            bias_single.append(0)
-        else:
-            bias_single.append(1)
-        var = len(single_result.iloc[i][single_result.iloc[i]!= avg_output])/(repeat_-1)
-        #print(var, avg_output, single_result.iloc[i])
-        variance_single.append(var)
         
-        for key in out_dict.keys():
-            out_dict[key] = len(bag_result.iloc[i][bag_result.iloc[i]==key])
-        avg_output = max(out_dict, key=out_dict.get)
-        if test_dataloader.data_dict[test_dataloader.label_keys[0]][i] == avg_output:
-            bias_bag.append(0)
-        else:
-            bias_bag.append(1)
-        var = len(bag_result.iloc[i][bag_result.iloc[i]!= avg_output])/(repeat_-1)
-        variance_bag.append(var)
+        avg_output = len(single_result.iloc[i][single_result.iloc[i]=="yes"])/repeat_
+        diff_b = np.where(test_dataloader.data_dict[test_dataloader.label_keys[0]][i] == "yes", 1, 0)
+        diff_b = (diff_b - avg_output)**2
+        bias_s = np.mean(diff_b)
+        bias_single.append(bias_s)
+        diff_v = np.where(single_result.iloc[i] == "yes", 1, 0)
+        diff_v = (diff_v - avg_output)**2
+        var_s = np.sum(diff_v)/(repeat_-1)
+        variance_single.append(var_s)
+        #print(bias_s, var_s)
+        
+        avg_output = len(bag_result.iloc[i][bag_result.iloc[i]=="yes"])/repeat_
+        diff_b = np.where(test_dataloader.data_dict[test_dataloader.label_keys[0]][i] == "yes", 1, 0)
+        diff_b = (diff_b - avg_output)**2
+        bias_b = np.mean(diff_b)
+        bias_bag.append(bias_b)
+        diff_v = np.where(bag_result.iloc[i] == "yes", 1, 0)
+        diff_v = (diff_v - avg_output)**2
+        var_b = np.sum(diff_v)/(repeat_-1)
+        variance_bag.append(var_b)
+        #print(bias_b, var_b)
+        
         
     bias_single_avg = np.average(bias_single)
     variance_single_avg = np.average(variance_single)

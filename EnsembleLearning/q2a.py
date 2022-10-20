@@ -61,6 +61,26 @@ if __name__ == "__main__":
     
     steps = []
     
+    # a = train_df.loc[train_df["duration"]=="yes"]
+    # print(len(a.loc[a["y"]=="yes"]), len(a.loc[a["y"]=="no"]))
+    # e_a = len(a.loc[a["y"]=="yes"])
+    # b = train_df.loc[train_df["duration"]=="no"]
+    # print(len(b.loc[b["y"]=="yes"]), len(b.loc[b["y"]=="no"]))
+    # e_b = len(b.loc[b["y"]=="yes"])
+    # print((e_a+e_b)/train_dataloader.len)
+    
+    # a = train_df.loc[train_df["pdays"]=="yes"]
+    # print(len(a.loc[a["y"]=="yes"]), len(a.loc[a["y"]=="no"]))
+    # b = train_df.loc[train_df["pdays"]=="no"]
+    # print(len(b.loc[b["y"]=="yes"]), len(b.loc[b["y"]=="no"]))
+    
+    # a = train_df.loc[train_df["duration"]=="yes"]
+    # print(len(a.loc[a["y"]=="yes"]), len(a.loc[a["y"]=="no"]))
+    # b = train_df.loc[train_df["duration"]=="no"]
+    # print(len(b.loc[b["y"]=="yes"]), len(b.loc[b["y"]=="no"]))
+    
+    
+    
     for i in range(50):
         print(f"-------- Training Decision tree for t={i+1} ------------")
         #print(train_df)
@@ -82,7 +102,7 @@ if __name__ == "__main__":
         train_df["weights"] = weights_
         vote_list.append(vote)
         model_list.append(id3_bank)
-        
+        #print(vote)
         steps.append(i)
         train_error = train_dataloader.calculate_final_error(model_list, vote_list)
         test_error = test_dataloader.calculate_final_error(model_list, vote_list)

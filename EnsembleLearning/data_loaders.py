@@ -112,8 +112,8 @@ class DataLoader(object):
                 output_ = models[j].run_inference(input_)
                 out_dict[output_] += votes[j]
             output_y = max(out_dict, key=out_dict.get)
-            # if i == random.randint(0, self.len-1):
-            #     print(out_dict, self.data_dict[self.label_keys[0]][i])
+            if i == 50:
+                print(out_dict, self.data_dict[self.label_keys[0]][i])
             if output_y != self.data_dict[self.label_keys[0]][i]:
                 #print(output_y, self.data_dict[self.label_keys[0]][i], input_, i, out_dict)
                 error += 1

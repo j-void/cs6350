@@ -148,7 +148,7 @@ class ID3(object):
                 max_ig = ig_
                 best_attr = attribute_keys[i]
             #print("IG of", attribute_keys[i], "=",ig_)
-        print("Best Attribute:", best_attr)
+        #print("Best Attribute:", best_attr)
         #print(attribute_keys)
         root_node = Node(best_attr)
         unique_labels_new = attributes[best_attr]
