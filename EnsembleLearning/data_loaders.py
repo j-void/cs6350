@@ -16,8 +16,6 @@ class DataLoader(object):
         self.len = 0
         self.median_info = {}
 
-        
-
     def load_data(self):
         count = 0
         with open(self.path , 'r') as f : 
@@ -91,6 +89,24 @@ class DataLoader(object):
         #print("Wrong Labels =", error, self.len)
         return error/self.len, correct_index, wrong_index
     
+    def calculate_weighted_error(self, model, weights):
+        error = 0
+        correct_index = []
+        wrong_index = []
+        for i in range(self.len):
+            input_ = {}
+            for key in self.attribute_keys:
+                input_[key] = self.data_dict[key][i]
+            output_y = model.run_inference(input_)
+            if output_y != self.data_dict[self.label_keys[0]][i]:
+                #print(output_y, self.data_dict[self.label_keys[0]][i], input_, i)
+                error += weights[i]
+                wrong_index.append(i)
+            else:
+                correct_index.append(i)
+        #print(np.sum(weights))
+        return error, correct_index, wrong_index
+    
     def get_output_all(self, model):
         outputs = []
         for i in range(self.len):
@@ -100,6 +116,25 @@ class DataLoader(object):
             output_y = model.run_inference(input_)
             outputs.append(output_y)
         return outputs
+    
+    def calculate_final_error_weighted(self, models, votes, weights):
+        error = 0
+        for i in range(self.len):
+            input_ = {}
+            out_dict = dict.fromkeys(self.label_out , 0)
+            for key in self.attribute_keys:
+                input_[key] = self.data_dict[key][i]
+            for j in range(len(models)):
+                output_ = models[j].run_inference(input_)
+                out_dict[output_] += votes[j]
+            output_y = max(out_dict, key=out_dict.get)
+            # if i == 50:
+            #     print(out_dict, self.data_dict[self.label_keys[0]][i])
+            if output_y != self.data_dict[self.label_keys[0]][i]:
+                #print(output_y, self.data_dict[self.label_keys[0]][i], input_, i, out_dict)
+                error += weights[i]
+        #print("Wrong Labels =", error, self.len)
+        return error/np.sum(weights)
     
     def calculate_final_error(self, models, votes):
         error = 0
@@ -112,8 +147,8 @@ class DataLoader(object):
                 output_ = models[j].run_inference(input_)
                 out_dict[output_] += votes[j]
             output_y = max(out_dict, key=out_dict.get)
-            if i == 50:
-                print(out_dict, self.data_dict[self.label_keys[0]][i])
+            # if i == 50:
+            #     print(out_dict, self.data_dict[self.label_keys[0]][i])
             if output_y != self.data_dict[self.label_keys[0]][i]:
                 #print(output_y, self.data_dict[self.label_keys[0]][i], input_, i, out_dict)
                 error += 1

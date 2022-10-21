@@ -90,28 +90,27 @@ if __name__ == "__main__":
         bias_rf = []
         variance_rf = []
         for i in range(test_dataloader.len):
-            out_dict = dict.fromkeys(test_dataloader.label_out , 0)
-            #print(len(single_result.iloc[i][single_result.iloc[i]=="no"]))
-            for key in out_dict.keys():
-                out_dict[key] = len(single_result.iloc[i][single_result.iloc[i]==key])
-            avg_output = max(out_dict, key=out_dict.get)
-            if test_dataloader.data_dict[test_dataloader.label_keys[0]][i] == avg_output:
-                bias_single.append(0)
-            else:
-                bias_single.append(1)
-            var = len(single_result.iloc[i][single_result.iloc[i]!= avg_output])/(N-1)
-            #print(var, avg_output, single_result.iloc[i])
-            variance_single.append(var)
+            avg_output = len(single_result.iloc[i][single_result.iloc[i]=="yes"])/N
+            diff_b = np.where(test_dataloader.data_dict[test_dataloader.label_keys[0]][i] == "yes", 1, 0)
+            diff_b = (diff_b - avg_output)**2
+            bias_s = np.mean(diff_b)
+            bias_single.append(bias_s)
+            diff_v = np.where(single_result.iloc[i] == "yes", 1, 0)
+            diff_v = (diff_v - avg_output)**2
+            var_s = np.sum(diff_v)/(N-1)
+            variance_single.append(var_s)
+            #print(bias_s, var_s)
             
-            for key in out_dict.keys():
-                out_dict[key] = len(rf_result.iloc[i][rf_result.iloc[i]==key])
-            avg_output = max(out_dict, key=out_dict.get)
-            if test_dataloader.data_dict[test_dataloader.label_keys[0]][i] == avg_output:
-                bias_rf.append(0)
-            else:
-                bias_rf.append(1)
-            var = len(rf_result.iloc[i][rf_result.iloc[i]!= avg_output])/(N-1)
-            variance_rf.append(var)
+            avg_output = len(rf_result.iloc[i][rf_result.iloc[i]=="yes"])/N
+            diff_b = np.where(test_dataloader.data_dict[test_dataloader.label_keys[0]][i] == "yes", 1, 0)
+            diff_rf = (diff_b - avg_output)**2
+            bias_r = np.mean(diff_b)
+            bias_rf.append(bias_r)
+            diff_v = np.where(rf_result.iloc[i] == "yes", 1, 0)
+            diff_v = (diff_v - avg_output)**2
+            var_rf = np.sum(diff_v)/(N-1)
+            variance_rf.append(var_rf)
+            
         bias_single_avg = np.average(bias_single)
         variance_single_avg = np.average(variance_single)
         gse_single = bias_single_avg + variance_single_avg

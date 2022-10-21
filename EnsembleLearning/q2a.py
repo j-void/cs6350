@@ -34,8 +34,7 @@ if __name__ == "__main__":
     
     train_dataloader = DataLoader("bank-2/train.csv", attribute_values, label_values)
     train_df = train_dataloader.convert_binary(["age", "balance", "day", "duration", "campaign", "pdays", "previous"])
-    weights = [1/train_dataloader.len] * train_dataloader.len
-    train_df["weights"] = weights
+    train_df["weights"] = [1/train_dataloader.len] * train_dataloader.len
     
     # attribute_values = {
     #     "outlook": ["sunny", "overcast", "rain"],
@@ -61,53 +60,37 @@ if __name__ == "__main__":
     
     steps = []
     
-    # a = train_df.loc[train_df["duration"]=="yes"]
-    # print(len(a.loc[a["y"]=="yes"]), len(a.loc[a["y"]=="no"]))
-    # e_a = len(a.loc[a["y"]=="yes"])
-    # b = train_df.loc[train_df["duration"]=="no"]
-    # print(len(b.loc[b["y"]=="yes"]), len(b.loc[b["y"]=="no"]))
-    # e_b = len(b.loc[b["y"]=="yes"])
-    # print((e_a+e_b)/train_dataloader.len)
-    
-    # a = train_df.loc[train_df["pdays"]=="yes"]
-    # print(len(a.loc[a["y"]=="yes"]), len(a.loc[a["y"]=="no"]))
-    # b = train_df.loc[train_df["pdays"]=="no"]
-    # print(len(b.loc[b["y"]=="yes"]), len(b.loc[b["y"]=="no"]))
-    
-    # a = train_df.loc[train_df["duration"]=="yes"]
-    # print(len(a.loc[a["y"]=="yes"]), len(a.loc[a["y"]=="no"]))
-    # b = train_df.loc[train_df["duration"]=="no"]
-    # print(len(b.loc[b["y"]=="yes"]), len(b.loc[b["y"]=="no"]))
-    
-    
-    
-    for i in range(50):
+    for i in range(500):
         print(f"-------- Training Decision tree for t={i+1} ------------")
         #print(train_df)
         id3_bank = ID3(label_values, attribute_values, 1, purity_type="entropy")
-        id3_bank.train(train_df)
-        
-        #id3_bank.root_node.print_tree()
-        e, ci, wi = train_dataloader.calculate_error(id3_bank)
-        vote = math.log((1-e)/e)/2
-        
-        ## get the weights
+        id3_bank.train_weighted(train_df)
+        ## get current weights
         weights_ = train_df["weights"].to_numpy()
+        #id3_bank.root_node.print_tree()
+        e, ci, wi = train_dataloader.calculate_weighted_error(id3_bank, weights_)
+        #print(np.sum(weights_), e, len(ci), len(wi), np.sum(weights_[ci]), np.sum(weights_[wi]), np.unique(weights_[ci]), np.unique(weights_[wi]))
+        vote = math.log((1.0-e)/e)/2.0
+        #print("vote =", vote)
+        #print(math.exp(-vote)*np.unique(weights_[ci]), math.exp(vote)*np.unique(weights_[wi]))
         ## increase the weight of wrong examples and decrease weight of correct examples
         weights_[ci] = weights_[ci] * math.exp(-vote)
         weights_[wi] = weights_[wi] * math.exp(vote)
-        
+        #print(np.sum(weights_), np.sum(weights_[ci]), np.sum(weights_[wi]), np.unique(weights_[ci]), np.unique(weights_[wi]))
         ## normalize the weights
-        weights_ = weights_ / np.sum(weights_)
+        #weights_ = weights_ / np.sum(weights_)
         train_df["weights"] = weights_
+        #print(np.sum(weights_), np.sum(weights_[ci]), np.sum(weights_[wi]), np.unique(weights_[ci]), np.unique(weights_[wi]))
         vote_list.append(vote)
         model_list.append(id3_bank)
-        #print(vote)
+        
         steps.append(i)
         train_error = train_dataloader.calculate_final_error(model_list, vote_list)
-        test_error = test_dataloader.calculate_final_error(model_list, vote_list)
         train_inv_error, _, _ = train_dataloader.calculate_error(id3_bank)
+        
+        test_error = test_dataloader.calculate_final_error(model_list, vote_list)
         test_inv_error, _, _ = test_dataloader.calculate_error(id3_bank)
+    
         
         # train_errors.append(train_error)
         # test_errors.append(test_error)
