@@ -1,6 +1,5 @@
 import math
 import numpy as np
-from utils import *
 import pandas as pd 
 import matplotlib.pyplot as plt
 
@@ -32,35 +31,34 @@ if __name__ == "__main__":
     x_test, y_test = load_data("concrete/test.csv")
     
     ## intialize the weight vector
-    w = np.zeros((x_train.shape[1]))
-    r = 1
+    w = np.zeros((x_train.shape[1]), dtype=float)
+    r = 0.001
     steps = []
     costs = []
     
-    for epoch in range(100):
+    for epoch in range(500):
         diff = 0
         for j in range(len(w)):
             dw = gradient(y_train, w, x_train, j)
             w[j] = w[j] - r*dw
-            diff += abs(r*dw)
         loss = cost(y_train, w, x_train)
         print(f"Loss at t={epoch} = {loss}, w={w}, lr={r}")
         steps.append(epoch)
         costs.append(loss)
-        th = diff/len(w)
-        if th > 1e-6:
-            r = r/2
-            w = np.zeros((x_train.shape[1]))
-        else:
-            break
+
     
     print(f"Final lr={r} and weights={w}")
     test_cost = cost(y_test, w, x_test)
     print(f"Test Cost={test_cost}")
     
+    import pickle
+    error_dict = {"costs":costs, "test_cost":test_cost, "lr":r, "w":w}
+    with open('q4a_out.pkl', 'wb') as f:
+        pickle.dump(error_dict, f)
+    
     fig, ax = plt.subplots()
     ax.plot(np.array(steps), np.array(costs), '-bo')
     ax.set(xlabel='steps', ylabel='cost')
-    # # fig.savefig("test.png")
-    plt.show()
+    fig.savefig("q4a.png")
+    #plt.show()
         

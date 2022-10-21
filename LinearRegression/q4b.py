@@ -1,6 +1,5 @@
 import math
 import numpy as np
-from utils import *
 import pandas as pd 
 
 
@@ -32,12 +31,12 @@ if __name__ == "__main__":
     x_test, y_test = load_data("concrete/test.csv")
     
     ## intialize the weight vector
-    w_init = np.zeros((x_train.shape[1]))
-    r = 0.03125
+    w_init = np.zeros((x_train.shape[1]), dtype=float)
+    r = 0.001
     steps = []
     costs = []
     w = w_init
-    for epoch in range(100):
+    for epoch in range(500):
         diff = 0
         for i in range(len(y_train)):
             w = w + r*(y_train[i]-np.dot(w.transpose(),x_train[i]))*x_train[i]
@@ -45,8 +44,6 @@ if __name__ == "__main__":
         print(f"Loss at t={epoch} is {loss}, w={w}")
         steps.append(epoch)
         costs.append(loss)
-        if loss < 1e-1:
-            break
 
     
     print(f"Final lr={r} and weights={w}")
