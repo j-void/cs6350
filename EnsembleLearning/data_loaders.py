@@ -4,6 +4,17 @@ import pandas as pd
 from collections import Counter
 import random
 
+def load_data_csv(path):
+        count = 0
+        with open(path , 'r') as f : 
+            for line in f :
+                terms = line.strip().split(',')
+                for i, key in enumerate(self.data_dict.keys()):
+                    self.data_dict[key].append(terms[i])
+                count += 1
+        self.len = count
+        return pd.DataFrame(self.data_dict)
+
 class DataLoader(object):
     def __init__(self, path, attribute_values, label_values):
         self.attribute_values = attribute_values.copy()
@@ -37,12 +48,29 @@ class DataLoader(object):
             self.median_info[attr] = median
         return pd.DataFrame(self.data_dict)
     
+    def convert_binary_01(self, numerical_attributes):
+        self.load_data()
+        for attr in numerical_attributes:
+            arr_ = np.array(self.data_dict[attr]).astype(float)
+            median = np.median(arr_)
+            self.data_dict[attr] = np.where(arr_>=median, "1", "0").tolist()
+            self.median_info[attr] = median
+        return pd.DataFrame(self.data_dict)
+    
     def convert_binary_test_data(self, median_dict):
         self.load_data()
         for attr in list(median_dict.keys()):
             arr_ = np.array(self.data_dict[attr]).astype(float)
             median_ = median_dict[attr]
             self.data_dict[attr] = np.where(arr_>=median_, "yes", "no").tolist()
+        return pd.DataFrame(self.data_dict)
+    
+    def convert_binary_test_data_01(self, median_dict):
+        self.load_data()
+        for attr in list(median_dict.keys()):
+            arr_ = np.array(self.data_dict[attr]).astype(float)
+            median_ = median_dict[attr]
+            self.data_dict[attr] = np.where(arr_>=median_, "1", "0").tolist()
         return pd.DataFrame(self.data_dict)
         
     def fill_missing_variables(self, value):
@@ -79,6 +107,7 @@ class DataLoader(object):
             input_ = {}
             for key in self.attribute_keys:
                 input_[key] = self.data_dict[key][i]
+            #print(input_)
             output_y = model.run_inference(input_)
             if output_y != self.data_dict[self.label_keys[0]][i]:
                 #print(output_y, self.data_dict[self.label_keys[0]][i], input_, i)

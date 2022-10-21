@@ -43,10 +43,14 @@ if __name__ == "__main__":
     #     "wind": ["strong", "weak"]
     # }
     # label_values = {"PlayTennis": ["yes", "no"]}
-    # train_dataloader = DataLoader("ex.csv", attribute_values, label_values)
+    # train_dataloader = DataLoader("ex_frac.csv", attribute_values, label_values)
     # train_df = train_dataloader.load_data()
-    # weights = [1/train_dataloader.len] * train_dataloader.len
+    # weights = [1] * train_dataloader.len
+    # weights[-1]= 5/14
+    # weights[-2]= 4/14
+    # weights[-3]= 5/14
     # train_df["weights"] = weights
+    # print(train_df["weights"].sum())
     
     vote_list = []
     model_list = []
@@ -69,18 +73,15 @@ if __name__ == "__main__":
         weights_ = train_df["weights"].to_numpy()
         #id3_bank.root_node.print_tree()
         e, ci, wi = train_dataloader.calculate_weighted_error(id3_bank, weights_)
-        #print(np.sum(weights_), e, len(ci), len(wi), np.sum(weights_[ci]), np.sum(weights_[wi]), np.unique(weights_[ci]), np.unique(weights_[wi]))
         vote = math.log((1.0-e)/e)/2.0
-        #print("vote =", vote)
-        #print(math.exp(-vote)*np.unique(weights_[ci]), math.exp(vote)*np.unique(weights_[wi]))
+
         ## increase the weight of wrong examples and decrease weight of correct examples
         weights_[ci] = weights_[ci] * math.exp(-vote)
         weights_[wi] = weights_[wi] * math.exp(vote)
-        #print(np.sum(weights_), np.sum(weights_[ci]), np.sum(weights_[wi]), np.unique(weights_[ci]), np.unique(weights_[wi]))
-        ## normalize the weights
-        #weights_ = weights_ / np.sum(weights_)
+
+        weights_ = weights_ / np.sum(weights_)
         train_df["weights"] = weights_
-        #print(np.sum(weights_), np.sum(weights_[ci]), np.sum(weights_[wi]), np.unique(weights_[ci]), np.unique(weights_[wi]))
+
         vote_list.append(vote)
         model_list.append(id3_bank)
         
@@ -92,28 +93,28 @@ if __name__ == "__main__":
         test_inv_error, _, _ = test_dataloader.calculate_error(id3_bank)
     
         
-        # train_errors.append(train_error)
-        # test_errors.append(test_error)
-        # train_inv_errors.append(train_inv_error)
-        # test_inv_errors.append(test_inv_error)
+        train_errors.append(train_error)
+        test_errors.append(test_error)
+        train_inv_errors.append(train_inv_error)
+        test_inv_errors.append(test_inv_error)
         
         print(f"Train Error after t={i} : {train_error}, {train_inv_error}")
         print(f"Test Error after t={i} : {test_error}, {test_inv_error}")
     
-    # import pickle
-    # error_dict = {"train_errors":train_errors, "test_errors":test_errors, "train_inv_errors":train_inv_errors, "test_inv_errors":test_inv_errors}
-    # with open('q2a_out.pkl', 'wb') as f:
-    #     pickle.dump(error_dict, f)
+    import pickle
+    error_dict = {"train_errors":train_errors, "test_errors":test_errors, "train_inv_errors":train_inv_errors, "test_inv_errors":test_inv_errors}
+    with open('q2a_out.pkl', 'wb') as f:
+        pickle.dump(error_dict, f)
     
-    # fig, ax = plt.subplots()
-    # ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
-    # ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
-    # ax.set(xlabel='steps', ylabel='Error Combined')
-    # ax.legend()
-    # fig.savefig("q2a_combined.png")
-    # fig, ax = plt.subplots()
-    # ax.plot(np.array(steps), np.array(train_inv_errors), '-bo', label="Train Error")
-    # ax.plot(np.array(steps), np.array(test_inv_errors), '-ro', label="Test Error")
-    # ax.set(xlabel='steps', ylabel='Error Individual')
-    # ax.legend()
-    # fig.savefig("q2a_individual.png")
+    fig, ax = plt.subplots()
+    ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
+    ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
+    ax.set(xlabel='steps', ylabel='Error Combined')
+    ax.legend()
+    fig.savefig("q2a_combined.png")
+    fig, ax = plt.subplots()
+    ax.plot(np.array(steps), np.array(train_inv_errors), '-bo', label="Train Error")
+    ax.plot(np.array(steps), np.array(test_inv_errors), '-ro', label="Test Error")
+    ax.set(xlabel='steps', ylabel='Error Individual')
+    ax.legend()
+    fig.savefig("q2a_individual.png")

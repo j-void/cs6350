@@ -93,6 +93,7 @@ class ID3(object):
         save_learned_model(file_path, self.root_node)
         print(f"-------- Saved learned model at {file_path} ------------")
     
+    ## Don't make any changes here
     def build_tree(self, data, attributes, max_depth):
         main_key = list(self.label.keys())[0]
         main_unique_labels = self.label[main_key]# S[label].unique()
@@ -208,7 +209,8 @@ class ID3(object):
             output_ = main_unique_labels[0]
             max_ = -1
             for i in range(len(main_unique_labels)):
-                llen = len(data.loc[data[main_key]==main_unique_labels[i]])
+                #print(data.loc[data[main_key]==main_unique_labels[i]])
+                llen = data.loc[data[main_key]==main_unique_labels[i]]["weights"].sum()
                 if llen > max_:
                     max_ = llen
                     output_ = main_unique_labels[i]
@@ -220,7 +222,7 @@ class ID3(object):
             output_ = main_unique_labels[0]
             max_ = -1
             for i in range(len(main_unique_labels)):
-                llen = len(data.loc[data[main_key]==main_unique_labels[i]])
+                llen = data.loc[data[main_key]==main_unique_labels[i]]["weights"].sum()#len(data.loc[data[main_key]==main_unique_labels[i]])
                 if llen > max_:
                     max_ = llen
                     output_ = main_unique_labels[i]
@@ -258,7 +260,7 @@ class ID3(object):
                 max_ig = ig_
                 best_attr = attribute_keys[i]
             #print("IG of", attribute_keys[i], "=",ig_)
-        print("Best Attribute:", best_attr)
+        #print("Best Attribute:", best_attr)
         #print(attribute_keys)
         root_node = Node(best_attr)
         unique_labels_new = attributes[best_attr]
@@ -273,7 +275,8 @@ class ID3(object):
                 output_ = main_unique_labels[0]
                 max_ = -1
                 for k in range(len(main_unique_labels)):
-                    llen = data.loc[data[main_key]==main_unique_labels[k]].shape[0]
+                    #print(data.loc[data[main_key]==main_unique_labels[k]])
+                    llen = data.loc[data[main_key]==main_unique_labels[i]]["weights"].sum()#data.loc[data[main_key]==main_unique_labels[k]].shape[0]
                     if llen > max_:
                         max_ = llen
                         output_ = main_unique_labels[k]
@@ -286,6 +289,7 @@ class ID3(object):
             for k in range(len(main_unique_labels)):
                 #print(main_unique_labels[k], list(self.label.keys())[0])
                 temp_data = data_new.loc[data_new[main_key]==main_unique_labels[k]]
+                #print(temp_data)
                 ## add a leaf node if all labels for the specific attribute value are same
                 if temp_data.shape[0] == data_new.shape[0]:
                     #print("Leaf Node at -", best_attr,"- (", main_unique_labels[k],",",temp_data.shape[0],")")
@@ -297,7 +301,7 @@ class ID3(object):
             if divide_tree:
                 new_attributes = attributes.copy()
                 del new_attributes[best_attr]
-                node_ = self.build_tree(data_new, new_attributes, max_depth)
+                node_ = self.build_tree_weighted(data_new, new_attributes, max_depth)
                 if node_ != None:
                     root_node.add_child(unique_labels_new[j], node_)
         
