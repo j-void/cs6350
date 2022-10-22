@@ -183,3 +183,5 @@ if __name__ == "__main__":
     import pickle
     with open('q3_out.pkl', 'wb') as f:
         pickle.dump(error_dict, f)
+    
+    print(error_dict)
