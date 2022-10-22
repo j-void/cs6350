@@ -145,7 +145,7 @@ class ID3(object):
                 entropy_current = self.purity_fn(prob_)
                 #print("Entropy =", entropy_current)
                 entropy_.append(entropy_current)
-                length_.append(data_current["weights"].sum())
+                length_.append(data_current.shape[0])
             ## calculate information gain
             #print("length_:", length_)
             ig_ = IG(entropy_total, length_, entropy_)
@@ -307,12 +307,11 @@ class ID3(object):
         
         return root_node
     
-    def rand_learn_tree(self, data, attributes, max_depth, feature_size):
+    def rand_learn_tree(self, data, attributes, max_depth, feature_size):        
         main_key = list(self.label.keys())[0]
         main_unique_labels = self.label[main_key]# S[label].unique()
-        ## subset the attributes
-        attributes = dict(random.sample(attributes.items(), feature_size))
-        #print(attributes)
+        #print(len(attributes.items()))
+        
         ## Take care of max depth condition
         #print(max_depth)
         max_depth -= 1
@@ -338,17 +337,22 @@ class ID3(object):
                     output_ = main_unique_labels[i]
             #print("Leaf Node (", output_,",",max_,")")
             return LeafNode(output_) 
+        ## subset the attributes
+        if len(attributes.items()) > feature_size:
+            attributes_sample = dict(random.sample(attributes.items(), feature_size))
+        else:
+            attributes_sample = attributes.copy()
         ### calculate probability
         prob_main = calculate_prob(data, self.label)
-        #print(prob_main)
+        #print("prob_main:", prob_main)
         entropy_total = self.purity_fn(prob_main)
         #print("main entropy =", entropy_total)
         max_ig = -math.inf
         best_attr = ""
-        attribute_keys = list(attributes.keys())
+        attribute_keys = list(attributes_sample.keys())
         ## Loop over all value of the attribute to check for the one with max information gain
         for i in range(len(attribute_keys)):
-            unique_labels_ = attributes[attribute_keys[i]] #S[attributes.keys()[i]].unique()
+            unique_labels_ = attributes_sample[attribute_keys[i]] #S[attributes.keys()[i]].unique()
             #print(unique_labels_)
             entropy_ = []
             length_ = []
@@ -357,21 +361,23 @@ class ID3(object):
                 if data_current.shape[0] == 0:
                     continue
                 prob_ = calculate_prob(data_current, self.label)
+                #print("prob -", attribute_keys[i] ,"-", unique_labels_[j],"-", prob_)
                 entropy_current = self.purity_fn(prob_)
                 #print("Entropy =", entropy_current)
                 entropy_.append(entropy_current)
                 length_.append(data_current.shape[0])
             ## calculate information gain
+            #print("length_:", length_)
             ig_ = IG(entropy_total, length_, entropy_)
             ## selecting the best attribute
             if ig_ > max_ig:
                 max_ig = ig_
                 best_attr = attribute_keys[i]
             #print("IG of", attribute_keys[i], "=",ig_)
-        ###print("Best Attribute:", best_attr)
+        #print("Best Attribute:", best_attr)
         #print(attribute_keys)
         root_node = Node(best_attr)
-        unique_labels_new = attributes[best_attr]
+        unique_labels_new = attributes_sample[best_attr]
         ## process the values of chosen attribute
         for j in range(len(unique_labels_new)):
             #print("processing - ",best_attr,"-",unique_labels_new[j])
@@ -407,12 +413,12 @@ class ID3(object):
             if divide_tree:
                 new_attributes = attributes.copy()
                 del new_attributes[best_attr]
-                node_ = self.build_tree(data_new, new_attributes, max_depth)
+                node_ = self.rand_learn_tree(data_new, new_attributes, max_depth, feature_size)
                 if node_ != None:
                     root_node.add_child(unique_labels_new[j], node_)
         
         return root_node
-        
+                
     def run_inference(self, input_dict):
         node_ = self.root_node
         while input_dict:

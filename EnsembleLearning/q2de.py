@@ -33,8 +33,8 @@ if __name__ == "__main__":
     
     train_dataloader = DataLoader("bank-2/train.csv", attribute_values, label_values)
     train_df = train_dataloader.convert_binary(["age", "balance", "day", "duration", "campaign", "pdays", "previous"])
-    weights = [1] * train_dataloader.len
-    train_df["weights"] = weights
+    #weights = [1] * train_dataloader.len
+    #train_df["weights"] = weights
     
     # attribute_values = {
     #     "outlook": ["sunny", "overcast", "rain"],

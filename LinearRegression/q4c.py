@@ -16,7 +16,10 @@ if __name__ == "__main__":
     ## load the data
     x_train, y_train = load_data("concrete/train.csv")
     
-    X = x_train.T
+    ones = np.ones([x_train.shape[0],x_train.shape[1]+1])
+    ones[:,1:] = x_train
+    X = x_train.T#ones.T
+    print(X.shape)
     Y = y_train.T
     
     A = X.dot(X.T)
