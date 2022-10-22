@@ -276,7 +276,7 @@ class ID3(object):
                 max_ = -1
                 for k in range(len(main_unique_labels)):
                     #print(data.loc[data[main_key]==main_unique_labels[k]])
-                    llen = data.loc[data[main_key]==main_unique_labels[i]]["weights"].sum()#data.loc[data[main_key]==main_unique_labels[k]].shape[0]
+                    llen = data.loc[data[main_key]==main_unique_labels[k]]["weights"].sum()#data.loc[data[main_key]==main_unique_labels[k]].shape[0]
                     if llen > max_:
                         max_ = llen
                         output_ = main_unique_labels[k]
