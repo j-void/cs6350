@@ -171,7 +171,7 @@ if __name__ == "__main__":
         test_errors.append(test_error)
         steps.append(i)
         
-    error_dict["adaboost"] = {"train_errors":train_errors, "test_errors":test_errors}
+    error_dict["rf"] = {"train_errors":train_errors, "test_errors":test_errors}
     
     fig, ax = plt.subplots()
     ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
