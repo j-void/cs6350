@@ -58,13 +58,12 @@ if __name__ == "__main__":
     
     for j in range(500):
         
-        #print(f"-------- Training for {j+1} ------------")
-        
+        #print(f"-------- Training for {j+1} trees - t={i+1}th tree ------------")
         ## Resample the data distribution
-        train_df = train_df.sample(frac=1, replace=True)
+        train_df_resampled = train_df.sample(frac=1, replace=True)
         
         id3_bank = ID3(label_values, attribute_values, purity_type="entropy")
-        id3_bank.train(train_df)
+        id3_bank.train(train_df_resampled)
         
         model_list.append(id3_bank)
             
@@ -73,7 +72,7 @@ if __name__ == "__main__":
         train_errors.append(train_error)
         test_errors.append(test_error)
         steps.append(j)
-        print(f"Error with t={j+1} trees; Train={train_error}, Test={test_error}")
+        print(f"Bagging - Error with t={j+1} trees; Train={train_error}, Test={test_error}")
         
     import pickle
     error_dict = {"train_errors":train_errors, "test_errors":test_errors}
