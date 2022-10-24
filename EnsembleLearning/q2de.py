@@ -66,10 +66,10 @@ if __name__ == "__main__":
         for i in range(N):
             print(f"-------- Training Decision tree for f_size: {f_size} & t={i+1} ------------")
             ## Resample the data distribution
-            train_df = train_df.sample(frac=1, replace=True)
+            train_df_resampled = train_df.sample(frac=1, replace=True)
             
             id3_bank = ID3(label_values, attribute_values, purity_type="entropy")
-            id3_bank.train_random_forest(train_df, f_size)
+            id3_bank.train_random_forest(train_df_resampled, f_size)
             
             model_list.append(id3_bank)
             
