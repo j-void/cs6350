@@ -54,30 +54,29 @@ if __name__ == "__main__":
     steps = []
     train_errors = []
     test_errors = []
+    model_list = []
     
     for j in range(500):
-        model_list = []
-        for i in range(j+1):
-            print(f"-------- Training for {j+1} trees - t={i+1}th tree ------------")
-            
-            ## Resample the data distribution
-            train_df = train_df.sample(frac=1, replace=True)
-            
-            id3_bank = ID3(label_values, attribute_values, purity_type="entropy")
-            id3_bank.train(train_df)
-            
-            model_list.append(id3_bank)
+        
+        #print(f"-------- Training for {j+1} trees - t={i+1}th tree ------------")
+        ## Resample the data distribution
+        train_df_resampled = train_df.sample(frac=1, replace=True)
+        
+        id3_bank = ID3(label_values, attribute_values, purity_type="entropy")
+        id3_bank.train(train_df_resampled)
+        
+        model_list.append(id3_bank)
             
         train_error= train_dataloader.calculate_bagging_error(model_list)
         test_error = test_dataloader.calculate_bagging_error(model_list)
         train_errors.append(train_error)
         test_errors.append(test_error)
         steps.append(j)
-        print(f"Error with t={j+1} trees; Train={train_error}, Test={test_error}")
+        print(f"Bagging - Error with t={j+1} trees; Train={train_error}, Test={test_error}")
         
     import pickle
     error_dict = {"train_errors":train_errors, "test_errors":test_errors}
-    with open('q2b_out.pkl', 'wb') as f:
+    with open('q2b_new_out.pkl', 'wb') as f:
         pickle.dump(error_dict, f)
     
     import matplotlib.pyplot as plt
@@ -86,7 +85,7 @@ if __name__ == "__main__":
     ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
     ax.legend()
     ax.set(xlabel='steps', ylabel='Error')
-    fig.savefig("q2b_1.png")
+    fig.savefig("q2b_new.png")
     
     
     

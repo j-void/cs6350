@@ -56,115 +56,115 @@ if __name__ == "__main__":
     test_dataloader = DataLoader("credit_card/test.csv", attribute_values, label_values)
     test_df = test_dataloader.convert_binary_test_data_01(train_dataloader.median_info)
     
-    ## Single Tree
-    print("---- Running Single Decision Tree ----")
-    id3_ = ID3(label_values, attribute_values, purity_type="entropy")
-    id3_.train(train_df)
+    # ## Single Tree
+    # print("---- Running Single Decision Tree ----")
+    # id3_ = ID3(label_values, attribute_values, purity_type="entropy")
+    # id3_.train(train_df)
     
-    train_error, _, _ = train_dataloader.calculate_error(id3_)
-    test_error, _, _ = test_dataloader.calculate_error(id3_)
-    print(f"Error for single tree: train={train_error}, test={test_error}")
-    error_dict = {"single_tree": {"train_error":train_error, "test_error":test_error}}
+    # train_error, _, _ = train_dataloader.calculate_error(id3_)
+    # test_error, _, _ = test_dataloader.calculate_error(id3_)
+    # print(f"Error for single tree: train={train_error}, test={test_error}")
+    # error_dict = {"single_tree": {"train_error":train_error, "test_error":test_error}}
     
-    with open('q3_out.pkl', 'wb') as f:
-        pickle.dump(error_dict, f)
+    # with open('q3_out.pkl', 'wb') as f:
+    #     pickle.dump(error_dict, f)
     
-    print("---- Running Adaboost ----")
+    # print("---- Running Adaboost ----")
     
-    weights = [1/train_dataloader.len] * train_dataloader.len
-    train_df["weights"] = weights
+    # weights = [1/train_dataloader.len] * train_dataloader.len
+    # train_df["weights"] = weights
     
-    vote_list = []
-    model_list = []
-    train_errors = []
-    test_errors = []
+    # vote_list = []
+    # model_list = []
+    # train_errors = []
+    # test_errors = []
     
-    steps = []
+    # steps = []
     
-    for i in range(500):
-        #print(f"-------- Training Decision tree for t={i+1} ------------")
+    # for i in range(500):
+    #     #print(f"-------- Training Decision tree for t={i+1} ------------")
         
-        id3_bank = ID3(label_values, attribute_values, 1, purity_type="entropy")
-        id3_bank.train_weighted(train_df)
-        ## get current weights
-        weights_ = train_df["weights"].to_numpy()
+    #     id3_bank = ID3(label_values, attribute_values, 1, purity_type="entropy")
+    #     id3_bank.train_weighted(train_df)
+    #     ## get current weights
+    #     weights_ = train_df["weights"].to_numpy()
 
-        e, ci, wi = train_dataloader.calculate_weighted_error(id3_bank, weights_)
-        vote = math.log((1.0-e)/e)/2.0
+    #     e, ci, wi = train_dataloader.calculate_weighted_error(id3_bank, weights_)
+    #     vote = math.log((1.0-e)/e)/2.0
 
-        ## increase the weight of wrong examples and decrease weight of correct examples
-        weights_[ci] = weights_[ci] * math.exp(-vote)
-        weights_[wi] = weights_[wi] * math.exp(vote)
+    #     ## increase the weight of wrong examples and decrease weight of correct examples
+    #     weights_[ci] = weights_[ci] * math.exp(-vote)
+    #     weights_[wi] = weights_[wi] * math.exp(vote)
 
-        weights_ = weights_ / np.sum(weights_)
-        train_df["weights"] = weights_
+    #     weights_ = weights_ / np.sum(weights_)
+    #     train_df["weights"] = weights_
 
-        vote_list.append(vote)
-        model_list.append(id3_bank)
+    #     vote_list.append(vote)
+    #     model_list.append(id3_bank)
         
-        steps.append(i)
-        train_error = train_dataloader.calculate_final_error(model_list, vote_list)
-        test_error = test_dataloader.calculate_final_error(model_list, vote_list)
+    #     steps.append(i)
+    #     train_error = train_dataloader.calculate_final_error(model_list, vote_list)
+    #     test_error = test_dataloader.calculate_final_error(model_list, vote_list)
         
-        train_errors.append(train_error)
-        test_errors.append(test_error)
+    #     train_errors.append(train_error)
+    #     test_errors.append(test_error)
         
-        print(f"Adaboost - Error after t={i} : train={train_error}, test={test_error}")
+    #     print(f"Adaboost - Error after t={i} : train={train_error}, test={test_error}")
     
-    fig, ax = plt.subplots()
-    ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
-    ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
-    ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["train_error"]), '-g', label="Train Error - Full")
-    ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["test_error"]), '-y', label="Test Error - Full")
-    ax.set(xlabel='steps', ylabel='Error Combined')
-    ax.legend()
-    fig.savefig("q3_adaboost.png")
+    # fig, ax = plt.subplots()
+    # ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
+    # ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
+    # ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["train_error"]), '-g', label="Train Error - Full")
+    # ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["test_error"]), '-y', label="Test Error - Full")
+    # ax.set(xlabel='steps', ylabel='Error Combined')
+    # ax.legend()
+    # fig.savefig("q3_adaboost.png")
     
-    error_dict["adaboost"] = {"train_errors":train_errors, "test_errors":test_errors}
-    with open('q3_out.pkl', 'wb') as f:
-        pickle.dump(error_dict, f)
+    # error_dict["adaboost"] = {"train_errors":train_errors, "test_errors":test_errors}
+    # with open('q3_out.pkl', 'wb') as f:
+    #     pickle.dump(error_dict, f)
     
-    print("---- Running Bagging ----")
+    # print("---- Running Bagging ----")
     
-    weights = [1] * train_dataloader.len
-    train_df["weights"] = weights
+    # weights = [1] * train_dataloader.len
+    # train_df["weights"] = weights
     
-    steps = []
-    train_errors = []
-    test_errors = []
-    model_list = []
+    # steps = []
+    # train_errors = []
+    # test_errors = []
+    # model_list = []
     
-    for j in range(500):
+    # for j in range(500):
         
-        #print(f"-------- Training for {j+1} trees - t={i+1}th tree ------------")
-        ## Resample the data distribution
-        train_df_resampled = train_df.sample(frac=1, replace=True)
+    #     #print(f"-------- Training for {j+1} trees - t={i+1}th tree ------------")
+    #     ## Resample the data distribution
+    #     train_df_resampled = train_df.sample(frac=1, replace=True)
         
-        id3_bank = ID3(label_values, attribute_values, purity_type="entropy")
-        id3_bank.train(train_df_resampled)
+    #     id3_bank = ID3(label_values, attribute_values, purity_type="entropy")
+    #     id3_bank.train(train_df_resampled)
         
-        model_list.append(id3_bank)
+    #     model_list.append(id3_bank)
             
-        train_error= train_dataloader.calculate_bagging_error(model_list)
-        test_error = test_dataloader.calculate_bagging_error(model_list)
-        train_errors.append(train_error)
-        test_errors.append(test_error)
-        steps.append(j)
-        print(f"Bagging - Error with t={j+1} trees; Train={train_error}, Test={test_error}")
+    #     train_error= train_dataloader.calculate_bagging_error(model_list)
+    #     test_error = test_dataloader.calculate_bagging_error(model_list)
+    #     train_errors.append(train_error)
+    #     test_errors.append(test_error)
+    #     steps.append(j)
+    #     print(f"Bagging - Error with t={j+1} trees; Train={train_error}, Test={test_error}")
         
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots()
-    ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
-    ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
-    ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["train_error"]), '-g', label="Train Error - Full")
-    ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["test_error"]), '-y', label="Test Error - Full")
-    ax.legend()
-    ax.set(xlabel='steps', ylabel='Error')
-    fig.savefig("q3_bagging.png")
+    # import matplotlib.pyplot as plt
+    # fig, ax = plt.subplots()
+    # ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
+    # ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
+    # ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["train_error"]), '-g', label="Train Error - Full")
+    # ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["test_error"]), '-y', label="Test Error - Full")
+    # ax.legend()
+    # ax.set(xlabel='steps', ylabel='Error')
+    # fig.savefig("q3_bagging.png")
     
-    error_dict["bagging"] = {"train_errors":train_errors, "test_errors":test_errors}
-    with open('q3_out.pkl', 'wb') as f:
-        pickle.dump(error_dict, f)
+    # error_dict["bagging"] = {"train_errors":train_errors, "test_errors":test_errors}
+    # with open('q3_out.pkl', 'wb') as f:
+    #     pickle.dump(error_dict, f)
     
     
     print("---- Running Random Forest using feature size = 12 ----")
@@ -172,14 +172,15 @@ if __name__ == "__main__":
     train_errors = []
     test_errors = []
     steps = []
+    model_list = []
     
     for i in range(500):
         #print(f"-------- Training Decision tree for f_size: {f_size} & t={i+1} ------------")
         ## Resample the data distribution
-        train_df = train_df.sample(frac=1, replace=True)
+        train_df_resampled = train_df.sample(frac=1, replace=True)
         
         id3_bank = ID3(label_values, attribute_values, purity_type="entropy")
-        id3_bank.train_random_forest(train_df, 12)
+        id3_bank.train_random_forest(train_df_resampled, 12)
         
         model_list.append(id3_bank)
         
@@ -192,14 +193,14 @@ if __name__ == "__main__":
         
     error_dict["rf"] = {"train_errors":train_errors, "test_errors":test_errors}
     
-    fig, ax = plt.subplots()
-    ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
-    ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
-    ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["train_error"]), '-g', label="Train Error - Full")
-    ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["test_error"]), '-y', label="Test Error - Full")
-    ax.set(xlabel='steps', ylabel='Error Combined')
-    ax.legend()
-    fig.savefig("q3_rf.png")
+    # fig, ax = plt.subplots()
+    # ax.plot(np.array(steps), np.array(train_errors), '-bo', label="Train Error")
+    # ax.plot(np.array(steps), np.array(test_errors), '-ro', label="Test Error")
+    # ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["train_error"]), '-g', label="Train Error - Full")
+    # ax.plot(np.array(steps), np.full(len(steps), error_dict["single_tree"]["test_error"]), '-y', label="Test Error - Full")
+    # ax.set(xlabel='steps', ylabel='Error Combined')
+    # ax.legend()
+    # fig.savefig("q3_rf.png")
     
     with open('q3_out.pkl', 'wb') as f:
         pickle.dump(error_dict, f)
