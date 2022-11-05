@@ -41,8 +41,8 @@ if __name__ == "__main__":
     w_init = np.zeros((train_data[:,:-1].shape[1]), dtype=float)
     r = 0.1
     w = w_init
-    a = w_init
-    np.random.seed(10)
+    a = w_init.copy()
+    np.random.seed(20)
     for epoch in range(10):
         train_data_new = train_data.copy()
         np.random.shuffle(train_data_new)
@@ -51,7 +51,7 @@ if __name__ == "__main__":
             y_out = np.sign(np.dot(w.transpose(),x_train[i]))
             if y_train[i]*y_out<=0:
                 w = w + r*y_train[i]*x_train[i]
-                a = a + w
+            a = a + w
                 
     print(f"Final lr={r} and weights={w}")
     test_cost = cost(y_test, x_test, a)
