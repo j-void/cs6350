@@ -40,7 +40,7 @@ if __name__ == "__main__":
     
     ## intialize the weight vector
     w_init = np.zeros((train_data[:,:-1].shape[1]+1), dtype=float)
-    np.random.seed(12)
+    np.random.seed(35)
     C_list = [100/873, 500/873, 700/873]
     
     for C in C_list:

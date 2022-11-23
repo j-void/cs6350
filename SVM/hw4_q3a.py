@@ -12,6 +12,13 @@ def cost(y, x, w):
             jw += 1
     return jw/len(y)
 
+def cost_c(y, yt, xt, x, c):
+    jw = 0
+    for i in range(len(y)):
+        y_out = np.sum(np.einsum('i,i,i->i', c, yt, xt)*x[i])
+        if y[i]!=np.sign(y_out):
+            jw += 1
+    return jw/len(y)
 
 def load_data(path):
     y = []

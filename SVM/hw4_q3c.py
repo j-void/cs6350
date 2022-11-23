@@ -51,14 +51,19 @@ if __name__ == "__main__":
     saved_output = pickle.load( open( "q3b_out.pkl", "rb" ) )
 
     
-    for C in C_list:
-        for g in gammas:
-            alphas = saved_output[str(C)][str(g)]["alpha"]
-            print(f"Length of support vectors={np.where(alphas>0)[0].shape[0]}")
+    for ci, C in enumerate(C_list):
+        for gi, g in enumerate(gammas):
+            alphas = saved_output[str(ci)][str(g)]["alpha"]
+            print(f"Length of support vectors for C={C} and gamma={g} is {np.where(alphas>0)[0].shape[0]}")
             
-    for g in gammas:
-        alphas = saved_output[str(C_list[1])][str(g)]["alpha"]
-        print(f"Length of support vectors={np.where(alphas>0)[0].shape[0]}")
+    for i in range(len(gammas)-1):
+        alphas_1 = saved_output["1"][str(gammas[i])]["alpha"]
+        alphas_2 = saved_output["1"][str(gammas[i+1])]["alpha"]
+        svm_idx1 = np.where(alphas_1>0)[0]
+        svm_idx2 = np.where(alphas_2>0)[0]
+        same_idx = np.in1d(svm_idx1, svm_idx2)
+        print(f'Number of overlapped support vectors between gamma=({gammas[i]}, {np.where(alphas_1>0)[0].shape[0]}) and gamma=({gammas[i+1]}, {np.where(alphas_2>0)[0].shape[0]}) is {np.sum(same_idx)}')
+        
         
     
     

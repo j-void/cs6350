@@ -12,6 +12,15 @@ def cost(y, x, w):
             jw += 1
     return jw/len(y)
 
+def cost_c(y, yt, xt, x, c, g, b):
+    jw = 0
+    for i in range(len(y)):
+        dist = np.linalg.norm(xt-x[i], axis=1)
+        kernel = np.exp(-(dist**2/g))
+        y_out = np.sum(np.einsum('i,i,i->i', c, yt, kernel))
+        if y[i]!=np.sign(y_out):
+            jw += 1
+    return jw/len(y)
 
 def load_data(path):
     y = []
@@ -75,9 +84,11 @@ if __name__ == "__main__":
             b = np.mean(yb - np.einsum('i,ji->j', w, xb))
             w = np.append(w, b)
 
-            train_cost = cost(y_train, x_train, w)
-            print(f"Final weights={w} for C={C} and gamma={g}")
-            test_cost = cost(y_test, x_test, w)
+            #train_cost = cost(y_train, x_train, w)
+            train_cost = cost_c(y_train, y_train, x_train, x_train, res.x, g, b)
+            #print(f"Final weights={w} for C={C} and gamma={g}")
+            #test_cost = cost(y_test, x_test, w)
+            test_cost = cost_c(y_test, y_train, x_train, x_test, res.x, g, b)
             print(f"Error for C={C} and gamma={g} : Train={train_cost}; Test={test_cost}")
             print(f"Length of support vectors={np.where(res.x>0)[0].shape[0]}")
             out_dict[str(ci)][str(g)] = {"train_cost":train_cost, "test_cost":test_cost, "w":w, "alpha":res.x}

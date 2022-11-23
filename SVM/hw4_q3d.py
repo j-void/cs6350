@@ -11,13 +11,12 @@ def cost(y, x, w):
             jw += 1
     return jw/len(y)
 
-def cost_c(y, x, c, g):
+def cost_c(y, yt, xt, x, c, g):
     jw = 0
     for i in range(len(y)):
-        dist = np.linalg.norm(x-x[i], axis=1)
+        dist = np.linalg.norm(xt-x[i], axis=1)
         kernel = np.exp(-(dist**2/g))
-        y_out = np.sum(np.einsum('i,i,i->i', c, y, kernel))
-        #print(y[i], y_out)
+        y_out = np.sum(np.einsum('i,i,i->i', c, yt, kernel))
         if y[i]!=np.sign(y_out):
             jw += 1
     return jw/len(y)
@@ -66,10 +65,11 @@ if __name__ == "__main__":
                 if y_train[i]!=y_out:
                     c[i] = c[i] + 1
         w = np.einsum('i,i,ik->k', c, y_train, x_train)
-        train_cost = cost_c(y_train, x_train, c, g)
+        train_cost = cost_c(y_train, y_train, x_train, x_train, c, g)
         #train_cost = cost(y_train, x_train, w)
-        test_cost = cost(y_test, x_test, w)
-        print(f"Final weights={w} for gamma={g}")
+        test_cost = cost_c(y_test, y_train, x_train, x_test, c, g)
+        #test_cost = cost(y_test, x_test, w)
+        #print(f"Final weights={w} for gamma={g}")
         print(f"Error for gamma={g} : Train={train_cost}; Test={test_cost}")
         
         
