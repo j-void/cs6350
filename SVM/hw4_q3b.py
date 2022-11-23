@@ -45,6 +45,7 @@ if __name__ == "__main__":
     train_data_new = train_data.copy()
     x_train, y_train = train_data_new[:,:-1], train_data_new[:,-1]
     
+    out_dict = {}
     
     for C in C_list:
         for g in gammas:
@@ -78,10 +79,11 @@ if __name__ == "__main__":
             test_cost = cost(y_test, x_test, w)
             print(f"Error for C={C} and gamma={g} : Train={train_cost}; Test={test_cost}")
             print(f"Length of support vectors={np.where(res.x>0)[0].shape[0]}")
+            out_dict[str(C)] = {}
+            out_dict[str(C)][str(g)] = {"train_cost":train_cost, "test_cost":test_cost, "w":w, "alpha":res.x}
     
-    # import pickle
-    # error_dict = {"costs":costs, "test_cost":test_cost, "lr":r, "w":w}
-    # with open('q4b_out.pkl', 'wb') as f:
-    #     pickle.dump(error_dict, f)
+    import pickle
+    with open('q3b_out.pkl', 'wb') as f:
+        pickle.dump(out_dict, f)
     
         
