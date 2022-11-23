@@ -47,8 +47,9 @@ if __name__ == "__main__":
     
     out_dict = {}
     
-    for C in C_list:
-        for g in gammas:
+    for ci, C in enumerate(C_list):
+        out_dict[str(ci)] = {}
+        for gi, g in enumerate(gammas):
             w = w_init
             alpha_init = np.zeros((y_train.shape[0]), dtype=float)
             def fun(alpha):
@@ -79,10 +80,10 @@ if __name__ == "__main__":
             test_cost = cost(y_test, x_test, w)
             print(f"Error for C={C} and gamma={g} : Train={train_cost}; Test={test_cost}")
             print(f"Length of support vectors={np.where(res.x>0)[0].shape[0]}")
-            out_dict[str(C)] = {}
-            out_dict[str(C)][str(g)] = {"train_cost":train_cost, "test_cost":test_cost, "w":w, "alpha":res.x}
+            out_dict[str(ci)][str(g)] = {"train_cost":train_cost, "test_cost":test_cost, "w":w, "alpha":res.x}
     
     import pickle
+    print('Saving the output in q3b_out.pkl')
     with open('q3b_out.pkl', 'wb') as f:
         pickle.dump(out_dict, f)
     

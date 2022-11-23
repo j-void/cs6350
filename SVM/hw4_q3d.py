@@ -66,9 +66,11 @@ if __name__ == "__main__":
                 if y_train[i]!=y_out:
                     c[i] = c[i] + 1
         w = np.einsum('i,i,ik->k', c, y_train, x_train)
-        #train_cost = cost_c(y_train, x_train, c, g)
-        train_cost = cost(y_train, x_train, w)
+        train_cost = cost_c(y_train, x_train, c, g)
+        #train_cost = cost(y_train, x_train, w)
         test_cost = cost(y_test, x_test, w)
         print(f"Final weights={w} for gamma={g}")
         print(f"Error for gamma={g} : Train={train_cost}; Test={test_cost}")
+        
+        
         
