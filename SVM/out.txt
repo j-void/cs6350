@@ -1,0 +1,20 @@
+(base) nihility:SVM janmesh007$ python hw4_q3a.py 
+Final weights=[-0.9429266  -0.65149175 -0.7337218  -0.04102184  2.53746883] for C=0.1145475372279496
+Error for C=0.1145475372279496 : Train=0.026376146788990827; Test=0.03
+Length of support vectors=404
+Final weights=[-2.5068657  -1.66554451 -1.91437346 -0.19753976  6.65192042] for C=0.572737686139748
+Error for C=0.572737686139748 : Train=0.03096330275229358; Test=0.038
+Length of support vectors=426
+Final weights=[-4.54949585 -2.94569294 -3.42767173 -0.44590942 11.45546123] for C=0.8018327605956472
+Error for C=0.8018327605956472 : Train=0.03096330275229358; Test=0.036
+Length of support vectors=475
+
+
+(base) Nihility:SVM janmesh007$ python hw4_q3b.py 
+Final weights=[-176.13402398 -239.8551161    47.90621862   -0.68368425  484.20615859] for C=0.1145475372279496 and gamma=0.1
+Error for C=0.1145475372279496 and gamma=0.1 : Train=0.27408256880733944; Test=0.268
+Length of support vectors=870
+Final weights=[-3.46818224e+02 -4.75243025e+02  9.28828138e+01  7.95247615e-01
+  2.00116701e+03] for C=0.1145475372279496 and gamma=0.5
+Error for C=0.1145475372279496 and gamma=0.5 : Train=0.2408256880733945; Test=0.28
+Length of support vectors=859
