@@ -5,3 +5,5 @@ pip install pandas
 pip install matplotlib
 pip install pickle5
 pip install joblib
+pip install torch
+pip install tqdm
